@@ -1,77 +1,86 @@
-
 import { ProductsPage } from "../pages/Products";
 import { ShoppingCartPage } from "../pages/ShoppingCart";
+import { Data } from "./model";
 
 describe('Shopping cart', () => {
+  let data:Data;
   beforeEach(() => {
     ShoppingCartPage.visit()
+    cy.fixture("data").then(dataJson => {
+      data = dataJson;
+    });
   });
 
   it("Adding two products to the cart and going to the user cart and remove one product from cart", () => {
-    ProductsPage.addProductToCart("Sauce Labs Backpack")
-    ProductsPage.addProductToCart("Sauce Labs Bike Light")
+    ProductsPage.addProductToCart(data.product_1)
+    ProductsPage.addProductToCart(data.product_2)
     ShoppingCartPage.shoppingCartContainerElement.click()
-    cy.url().should("contain", "cart.html")
-    cy.get(".title").should("have.text", "Your Cart")
+    cy.url().should("contain", data.cartPage)
+    ShoppingCartPage.titleElement.should("have.text", data.userCart)
     ShoppingCartPage.cartItemElement.should("have.length", 2)
-    ShoppingCartPage.removeProductFromCart("Sauce Labs Bike Light")
+    ShoppingCartPage.removeProductFromCart(data.product_2)
     ShoppingCartPage.cartItemElement.should("have.length", 1)
   });
 
   it("Adding product to cart and going to the user cart and press button continue shopping", () => {
-    ProductsPage.addProductToCart("Sauce Labs Backpack")
+    ProductsPage.addProductToCart(data.product_1)
     ShoppingCartPage.shoppingCartContainerElement.click()
-    cy.get("#continue-shopping").click()
-    cy.url().should("contain", "inventory.html")
+    ShoppingCartPage.continueShoppingElement.click()
+    cy.url().should("contain", data.productsPage)
   });
 })
 
 describe('Adding product to cart and going to the user cart and press button checkout', () => {
-
+let data:Data;
   beforeEach(() => {
     ShoppingCartPage.visit()
     ProductsPage.addProductToCart("Sauce Labs Backpack")
     ShoppingCartPage.shoppingCartContainerElement.click()
-    cy.get("#checkout").click()
-    cy.url().should("contain", "checkout-step-one.html") 
+    ShoppingCartPage.checkoutElement.click()
+    cy.url().should("contain", "checkout-step-one.html")
+    cy.fixture("data").then(dataJson => {
+      data = dataJson;
+    });
   });
 
   it("with user information - finish order", () => {
-   ShoppingCartPage.firstNameElement.type("Dunja")
-   ShoppingCartPage.lastNameElement.type("Jovanovic")
-   ShoppingCartPage.postalCodeElement.type("21000")
+    
+   ShoppingCartPage.firstNameElement.type(data.firstName)
+   ShoppingCartPage.lastNameElement.type(data.lastName)
+   ShoppingCartPage.postalCodeElement.type(data.postalCode)
    ShoppingCartPage.continueElement.click()
-   cy.url().should("contain", "checkout-step-two.html")
-   cy.get("#finish").click()
-   cy.url().should("contain", "checkout-complete.html")
-   cy.get(".complete-header").should("have.text", "THANK YOU FOR YOUR ORDER")
+   cy.url().should("contain", data.userCart_url)
+   ShoppingCartPage.finishOrderElement.click()
+   cy.url().should("contain", data.userCart_complete_url)
+   ShoppingCartPage.headerMessageElement.should("have.text", data.message_complete)
   }),
 
   it("with user information - cancel order", () => {
-    ShoppingCartPage.firstNameElement.type("Dunja")
-    ShoppingCartPage.lastNameElement.type("Jovanovic")
-    ShoppingCartPage.postalCodeElement.type("21000")
+    
+    ShoppingCartPage.firstNameElement.type(data.firstName)
+    ShoppingCartPage.lastNameElement.type(data.lastName)
+    ShoppingCartPage.postalCodeElement.type(data.postalCode)
     ShoppingCartPage.continueElement.click()
-    cy.url().should("contain", "checkout-step-two.html")
-    cy.get("#cancel").click()
-    cy.url().should("contain", "inventory.html")
-
+    cy.url().should("contain", data.userCart_url)
+    ShoppingCartPage.cancelOrderElement.click()
+    cy.url().should("contain", data.productsPage)
    }),
 
   it("without enter user information / after error message enter user information", () => {
+    
     ShoppingCartPage.continueElement.click()
     ShoppingCartPage.errorMessageElement.should("be.visible")
-    ShoppingCartPage.errorMessageElement.should("have.text", "Error: First Name is required")
+    ShoppingCartPage.errorMessageElement.should("have.text", data.err_msg_1)
     ShoppingCartPage.errorMessageElement.should("have.css", "background-color", "rgb(226, 35, 26)")
-    ShoppingCartPage.firstNameElement.type("Dunja")
+    ShoppingCartPage.firstNameElement.type(data.firstName)
     ShoppingCartPage.continueElement.click()
-    ShoppingCartPage.errorMessageElement.should("have.text", "Error: Last Name is required")
-    ShoppingCartPage.lastNameElement.type("Jovanovic")
+    ShoppingCartPage.errorMessageElement.should("have.text", data.err_msg_2)
+    ShoppingCartPage.lastNameElement.type(data.lastName)
     ShoppingCartPage.continueElement.click()
-    ShoppingCartPage.errorMessageElement.should("have.text", "Error: Postal Code is required")
-    ShoppingCartPage.postalCodeElement.type("21000")
+    ShoppingCartPage.errorMessageElement.should("have.text",data.err_msg_3)
+    ShoppingCartPage.postalCodeElement.type(data.postalCode)
     ShoppingCartPage.continueElement.click()
-    cy.url().should("contain", "checkout-step-two.html")
+    cy.url().should("contain", data.userCart_url)
   });
 });
 

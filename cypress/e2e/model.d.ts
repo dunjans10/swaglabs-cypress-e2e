@@ -1,0 +1,26 @@
+export interface Data {
+  errorMessage:string;
+  errorMessageLockedUser:string;
+  twiterLink:string;
+  facebookLink:string;
+  linkedinLink:string;
+  productsPage:string;
+  cartPage:string;
+  userCart:string;
+  userCart_url:string;
+  userCart_complete_url:string;
+  product_1:string;
+  product_1_url:string;
+  product_2:string;
+  product_3:string;
+  product_4:string;
+  product_5:string;
+  product_6:string;
+  firstName:string;
+  lastName:string;
+  postalCode:string;
+  message_complete:string;
+  err_msg_1:string;
+  err_msg_2:string;
+  err_msg_3:string;
+}

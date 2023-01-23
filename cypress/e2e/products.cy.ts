@@ -1,63 +1,66 @@
 import { LoginPage } from "../pages/Login";
 import { ProductsPage } from "../pages/Products";
+import { Data } from "./model";
 
 describe('SWAGLABS products', () => {
+  let data:Data;
   before(() => {
-    LoginPage.visit();
-    LoginPage.submitLogin("standard_user", "secret_sauce")
-    cy.url().should("contain", "inventory.html")
+    LoginPage.loginUser()
+    cy.fixture("data").then(dataJson => {
+      data = dataJson;
+    });
   });
 
   it("Six products should be displayed", () => {
-    cy.get(".inventory_item").should("have.length", 6)
+    cy.url().should("contain", data.productsPage)
+    ProductsPage.productItemElement.should("have.length", 6)
   });
 });
 
 describe('Displayed number in shopping cart icon when user add product(s)', () => {
+  let data:Data;
   beforeEach(() => {
-    LoginPage.visit();
-    LoginPage.submitLogin("standard_user", "secret_sauce")
-    cy.url().should("contain", "inventory.html")
+    LoginPage.loginUser()
+    cy.fixture("data").then(dataJson => {
+      data = dataJson;
+    });
   });
   
   it("Adding product(s) to cart", () => {
-    ProductsPage.addProductToCart("Sauce Labs Backpack")
+    cy.url().should("contain", data.productsPage)
+    ProductsPage.addProductToCart(data.product_1)
     ProductsPage.shoppingCartBadgeElement.should("contain", 1)
-    ProductsPage.addProductToCart("Sauce Labs Bike Light")
+    ProductsPage.addProductToCart(data.product_2)
     ProductsPage.shoppingCartBadgeElement.should("contain", 2)
-    ProductsPage.addProductToCart("Sauce Labs Bolt T-Shirt")
+    ProductsPage.addProductToCart(data.product_3)
     ProductsPage.shoppingCartBadgeElement.should("contain", 3)
-    ProductsPage.addProductToCart("Sauce Labs Fleece Jacket")
+    ProductsPage.addProductToCart(data.product_4)
     ProductsPage.shoppingCartBadgeElement.should("contain", 4)
-    ProductsPage.addProductToCart("Sauce Labs Onesie")
+    ProductsPage.addProductToCart(data.product_5)
     ProductsPage.shoppingCartBadgeElement.should("contain", 5)
-    ProductsPage.addProductToCart("Test.allTheThings() T-Shirt (Red)")
+    ProductsPage.addProductToCart(data.product_6)
     ProductsPage.shoppingCartBadgeElement.should("contain", 6)
   });
 
   it("Removing product(s) from cart", () => {
-    ProductsPage.addProductToCart("Sauce Labs Backpack")
+    cy.url().should("contain", data.productsPage)
+    ProductsPage.addProductToCart(data.product_1)
     ProductsPage.shoppingCartBadgeElement.should("contain", 1)
-    ProductsPage.addProductToCart("Sauce Labs Bike Light")
+    ProductsPage.addProductToCart(data.product_2)
     ProductsPage.shoppingCartBadgeElement.should("contain", 2)
-    ProductsPage.addProductToCart("Sauce Labs Bolt T-Shirt")
+    ProductsPage.addProductToCart(data.product_3)
     ProductsPage.shoppingCartBadgeElement.should("contain", 3)
-    ProductsPage.addProductToCart("Sauce Labs Fleece Jacket")
+    ProductsPage.addProductToCart(data.product_4)
     ProductsPage.shoppingCartBadgeElement.should("contain", 4)
 
-    ProductsPage.removeProductFromCart("Sauce Labs Fleece Jacket")
+    ProductsPage.removeProductFromCart(data.product_4)
     ProductsPage.shoppingCartBadgeElement.should("contain", 3)
-    ProductsPage.removeProductFromCart("Sauce Labs Bolt T-Shirt")
+    ProductsPage.removeProductFromCart(data.product_3)
     ProductsPage.shoppingCartBadgeElement.should("contain", 2)
-    ProductsPage.removeProductFromCart("Sauce Labs Bike Light")
+    ProductsPage.removeProductFromCart(data.product_2)
     ProductsPage.shoppingCartBadgeElement.should("contain", 1)
-    ProductsPage.removeProductFromCart("Sauce Labs Backpack")
-    ProductsPage.shoppingCartLinkElement.should("not.have.class", "shopping_cart_badge")
-    
-    
-    
-  
-  })
-
-})
+    ProductsPage.removeProductFromCart(data.product_1)
+    ProductsPage.shoppingCartLinkElement.should("not.have.class", "shopping_cart_badge")  
+  });
+});
 

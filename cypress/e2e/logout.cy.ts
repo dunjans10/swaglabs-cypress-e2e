@@ -1,31 +1,36 @@
 import { LoginPage } from "../pages/Login";
+import { LogoutPage } from "../pages/Logout";
+import { Data } from "./model";
 
 describe('Logout functionality', () => {
-  beforeEach(() => {
-    LoginPage.visit();
-    LoginPage.submitLogin("standard_user", "secret_sauce")
-    cy.url().should("contain", "inventory.html")
+  let data:Data;
+  before(() => {
+    LoginPage.loginUser()
+    cy.fixture("data").then(dataJson => {
+      data = dataJson;
+    }); 
   });
 
   it('Logout user from application', () => {
-    cy.get('#react-burger-menu-btn').click()
-    cy.get('#logout_sidebar_link').click()
-    cy.url().should('contain','\https://www.saucedemo.com/')
-
+    cy.url().should("contain", data.productsPage)
+    LogoutPage.menuBtnElement.click()
+    LogoutPage.logoutElement.click()
+    cy.url().should('contain', `${Cypress.config().baseUrl}`)
   });
 });
 
-
 describe('Slider bar', () => {
-  beforeEach(() => {
-    LoginPage.visit();
-    LoginPage.submitLogin("standard_user", "secret_sauce")
-    cy.url().should("contain", "inventory.html")
+  let data:Data;
+  before(() => {
+    LoginPage.loginUser()
+    cy.fixture("data").then(dataJson => {
+      data = dataJson;
+    });
   });
 
   it('open/close slide bar', () => {
-    cy.get('#react-burger-menu-btn').click()
+    cy.url().should("contain", data.productsPage)
+    LogoutPage.menuBtnElement.click()
     cy.contains('button', 'Close Menu').click()
-
   });
 });

@@ -1,24 +1,28 @@
+import { LinkPage } from "../pages/Links";
 import { LoginPage } from "../pages/Login";
+import { Data } from "./model";
 
 describe('Social pages', () => {
+  let data:Data;
   beforeEach(() => {
-    LoginPage.visit();
-    LoginPage.submitLogin("standard_user", "secret_sauce")
-    cy.url().should("contain", "inventory.html")
+    LoginPage.loginUser()
+    cy.fixture("data").then(dataJson => {
+      data = dataJson;
+    });
   });
 
   it("validate twiter link", () => {
-    cy.get(".social_twitter a").should("have.attr", "href", "https://twitter.com/saucelabs")
-    cy.get(".social_twitter a").should("have.attr", "target", "_blank")
+    LinkPage.twiterElement.should("have.attr", "href", data.twiterLink)
+    LinkPage.twiterElement.should("have.attr", "target", "_blank")
   });
 
   it("validate facebook link", () => {
-    cy.get(".social_facebook a").should("have.attr", "href", "https://www.facebook.com/saucelabs")
-    cy.get(".social_facebook a").should("have.attr", "target", "_blank")
+    LinkPage.facebookElement.should("have.attr", "href", data.facebookLink)
+    LinkPage.facebookElement.should("have.attr", "target", "_blank")
   });
 
   it("validate linkedin link", () => {
-    cy.get(".social_linkedin a").should("have.attr", "href", "https://www.linkedin.com/company/sauce-labs/")
-    cy.get(".social_linkedin a").should("have.attr", "target", "_blank")
+    LinkPage.linkedinElement.should("have.attr", "href", data.linkedinLink)
+    LinkPage.linkedinElement.should("have.attr", "target", "_blank")
   });
 });

@@ -1,21 +1,26 @@
 import { LoginPage } from "../pages/Login";
+import { ProductsPage } from "../pages/Products";
+import { Data } from "./model";
 
 describe('Product details page', () => {
+  let data:Data;
   before(() => {
-    LoginPage.visit();
-    LoginPage.submitLogin("standard_user", "secret_sauce")
-    cy.url().should("contain", "inventory.html")
+    LoginPage.loginUser()
+    cy.fixture("data").then(dataJson => {
+      data = dataJson;
+    });
   });
 
   it('showing information about product (Sauce Labs Backpack)', () => {
-    cy.contains('.inventory_item_name', 'Sauce Labs Backpack').click()
-    cy.url().should('contain', 'inventory-item.html?id=4')
-    cy.get('.inventory_details_name ').should('have.text', 'Sauce Labs Backpack')
-    cy.get('#add-to-cart-sauce-labs-backpack').click()
-    cy.get('.shopping_cart_badge').should('contain', 1)
-    cy.get('#remove-sauce-labs-backpack').click()
-    cy.get('.shopping_cart_link').should('not.have.value')
-    cy.get('#back-to-products').click()
-    cy.url().should('contain', 'inventory.html')
+    cy.url().should("contain", data.productsPage)
+    cy.contains('.inventory_item_name', data.product_1).click()
+    cy.url().should('contain', data.product_1_url)
+    ProductsPage.productDetailsNameElement.should('have.text', data.product_1)
+    ProductsPage.addToCartElement.click()
+    ProductsPage.shoppingCartBadgeElement.should('contain', 1)
+    ProductsPage.removeFromCartElement.click()
+    ProductsPage.shoppingCartLinkElement.should('not.have.value')
+    ProductsPage.backToProductsElement.click()
+    cy.url().should('contain', data.productsPage)
   })
 })
